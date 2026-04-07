@@ -76,6 +76,40 @@ const App = {
         });
     },
 
+    loadMyTickets: function() {
+        const container = document.getElementById('my-tickets-container');
+        container.innerHTML = '';
+        let myTickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
+        
+        if (myTickets.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted); font-size: 18px;">You have no booked tickets yet.</p>';
+            return;
+        }
+
+        myTickets.forEach(id => {
+            const resStr = resSys.searchTicket(id);
+            const res = JSON.parse(resStr);
+            if (!res.error) {
+                const card = document.createElement('div');
+                card.className = 'route-card';
+                card.style.cursor = 'default';
+                card.innerHTML = `
+                    <div class="route-header">
+                        <span class="route-id"><i class="fa-solid fa-ticket"></i> ${res.ticketID}</span>
+                        <span class="route-fare"><i class="fa-solid fa-indian-rupee-sign"></i>${res.totalAmount}</span>
+                    </div>
+                    <div class="route-path" style="font-size: 18px; margin-bottom: 15px;">Route: <span class="gold-text">${res.routeID}</span></div>
+                    <div class="route-meta" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                        <span><i class="fa-solid fa-user"></i> ${res.name}</span>
+                        <span><i class="fa-solid fa-chair"></i> Seats: ${res.seats.join(', ')}</span>
+                    </div>
+                    <button class="btn btn-danger full-width" style="margin-top: 20px; padding: 10px;" onclick="document.getElementById('cancel-id').value='${res.ticketID}'; showSection('cancel');">Cancel Booking</button>
+                `;
+                container.appendChild(card);
+            }
+        });
+    },
+
     openBooking: function(id, from, to, fare, seats) {
         currentRouteId = id;
         routeFare = fare;
@@ -147,6 +181,11 @@ const App = {
         if (res.error) {
             this.showToast(res.error, true);
         } else {
+            let myTickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
+            if (!myTickets.includes(res.ticketID)) {
+                myTickets.push(res.ticketID);
+                localStorage.setItem('myTickets', JSON.stringify(myTickets));
+            }
             this.saveState(); // Persist to IndexedDB
             this.showToast(`Success! Ticket ID: ${res.ticketID}`);
             this.closeModal();
@@ -186,10 +225,16 @@ const App = {
         if (res.error) {
             this.showToast(res.error, true);
         } else {
+            let myTickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
+            myTickets = myTickets.filter(t => t !== id);
+            localStorage.setItem('myTickets', JSON.stringify(myTickets));
             this.saveState(); // Persist to IndexedDB
             this.showToast("Ticket Cancelled Successfully.");
             document.getElementById('cancel-id').value = '';
             this.loadDashboard();
+            if(document.getElementById('my-tickets').classList.contains('active')) {
+                this.loadMyTickets();
+            }
         }
     },
 
@@ -262,5 +307,7 @@ function showSection(id) {
         App.loadReports();
     } else if (id === 'dashboard') {
         App.loadDashboard();
+    } else if (id === 'my-tickets') {
+        App.loadMyTickets();
     }
 }

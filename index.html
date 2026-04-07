@@ -32,6 +32,10 @@
                     <span class="nav-icon-container"><i class="fa-solid fa-layer-group"></i></span>
                     <span class="nav-text">Dashboard</span>
                 </a></li>
+                <li><a href="#" onclick="showSection('my-tickets')" id="nav-my-tickets">
+                    <span class="nav-icon-container"><i class="fa-solid fa-ticket-simple"></i></span>
+                    <span class="nav-text">My Tickets</span>
+                </a></li>
                 <li><a href="#" onclick="showSection('search')" id="nav-search">
                     <span class="nav-icon-container"><i class="fa-solid fa-magnifying-glass"></i></span>
                     <span class="nav-text">Search Ticket</span>
@@ -105,6 +109,16 @@
                 <input type="text" id="search-id" placeholder="Enter Ticket ID (e.g. T100)">
                 <button class="btn btn-primary" onclick="window.app.searchTicket()">Search</button>
                 <div id="search-result" class="search-result-card hidden"></div>
+            </div>
+        </section>
+
+        <!-- My Tickets Section -->
+        <section id="my-tickets" class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-ticket-simple icon-lrg"></i> My Tickets</h2>
+            </div>
+            <div id="my-tickets-container" class="routes-grid">
+                <!-- Tickets injected here -->
             </div>
         </section>
 
