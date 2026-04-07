@@ -103,7 +103,6 @@ const App = {
                         <span><i class="fa-solid fa-user"></i> ${res.name}</span>
                         <span><i class="fa-solid fa-chair"></i> Seats: ${res.seats.join(', ')}</span>
                     </div>
-                    <button class="btn btn-danger full-width" style="margin-top: 20px; padding: 10px;" onclick="document.getElementById('cancel-id').value='${res.ticketID}'; showSection('cancel');">Cancel Booking</button>
                 `;
                 container.appendChild(card);
             }
