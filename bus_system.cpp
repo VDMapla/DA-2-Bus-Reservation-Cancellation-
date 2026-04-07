@@ -78,7 +78,7 @@ public:
     }
 
     void loadRoutes() {
-        ifstream file("routes.txt");
+        ifstream file("/data/routes.txt");
         if(!file) {
             routes.push_back(Route("R1","Chennai","Bangalore",500,30));
             routes.push_back(Route("R2","Chennai","Hyderabad",700,30));
@@ -103,14 +103,14 @@ public:
     }
 
     void saveRoutes() {
-        ofstream file("routes.txt");
+        ofstream file("/data/routes.txt");
         for(auto &r : routes) {
             file << r.getID() << "," << r.from << "," << r.to << "," << r.getFare() << "," << r.getCapacity() << endl;
         }
     }
 
     void loadTickets() {
-        ifstream file("tickets.txt");
+        ifstream file("/data/tickets.txt");
         if(!file) return;
 
         int maxId = 99;
@@ -155,7 +155,7 @@ public:
     }
 
     void saveTickets() {
-        ofstream file("tickets.txt");
+        ofstream file("/data/tickets.txt");
         for(auto &t : tickets)
             file << t.serialize() << endl;
     }

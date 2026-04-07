@@ -7,12 +7,29 @@ let chartInstance = null;
 const App = {
     init: function() {
         console.log("WASM Module Initialized.");
-        resSys = new Module.ReservationSystem();
+        FS.mkdir('/data');
+        FS.mount(IDBFS, {}, '/data');
         
-        document.getElementById('loader').style.opacity = '0';
-        setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-        
-        this.loadDashboard();
+        // Sync from IndexedDB into WASM memory
+        FS.syncfs(true, (err) => {
+            if (err) console.error("IDBFS Sync Error:", err);
+            
+            // Instantiate AFTER sync so it reads the files if they exist
+            resSys = new Module.ReservationSystem();
+            
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+            
+            this.loadDashboard();
+        });
+    },
+
+    saveState: function() {
+        // Sync WASM memory back to IndexedDB
+        FS.syncfs(false, (err) => {
+            if (err) console.error("IDBFS Save Error:", err);
+            else console.log("State persistently saved!");
+        });
     },
 
     showToast: function(msg, isError = false) {
@@ -130,6 +147,7 @@ const App = {
         if (res.error) {
             this.showToast(res.error, true);
         } else {
+            this.saveState(); // Persist to IndexedDB
             this.showToast(`Success! Ticket ID: ${res.ticketID}`);
             this.closeModal();
             this.loadDashboard(); // refresh dashboard layout
@@ -168,6 +186,7 @@ const App = {
         if (res.error) {
             this.showToast(res.error, true);
         } else {
+            this.saveState(); // Persist to IndexedDB
             this.showToast("Ticket Cancelled Successfully.");
             document.getElementById('cancel-id').value = '';
             this.loadDashboard();
