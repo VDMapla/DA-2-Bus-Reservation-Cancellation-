@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redline Express | Premium Bus Reservation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <h2>Initializing Core System...</h2>
+        <p>Loading WASM Environment</p>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <div class="layout-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div><i class="fa-solid fa-bolt logo-red" style="font-size: 36px; margin-right: 10px;"></i> Nexus</div>
+                <div class="logo-subtitle">Seat Release & Revenue</div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('dashboard')" class="active" id="nav-dashboard">
+                    <span class="nav-icon-container"><i class="fa-solid fa-layer-group"></i></span>
+                    <span class="nav-text">Dashboard</span>
+                </a></li>
+                <li><a href="#" onclick="showSection('search')" id="nav-search">
+                    <span class="nav-icon-container"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <span class="nav-text">Search Ticket</span>
+                </a></li>
+                <li><a href="#" onclick="showSection('cancel')" id="nav-cancel">
+                    <span class="nav-icon-container"><i class="fa-solid fa-ban"></i></span>
+                    <span class="nav-text">Cancel Ticket</span>
+                </a></li>
+                <li><a href="#" onclick="showSection('reports')" id="nav-reports">
+                    <span class="nav-icon-container"><i class="fa-solid fa-chart-pie"></i></span>
+                    <span class="nav-text">Revenue Reports</span>
+                </a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="sys-status"><div class="status-dot"></div> System Online</div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Glow Orbs for Premium feel -->
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <div class="hero-badge"><i class="fa-solid fa-microchip"></i> C++ WASM Engine Active</div>
+                <h1 class="hero-title">Elevate Your <span class="gold-text">Journey</span></h1>
+                <p class="hero-subtitle">Experience a next-generation reservation engine instantly processed via ultra-fast WebAssembly.</p>
+            </div>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="quick-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                        <div class="stat-details">
+                            <h3>Total Revenue</h3>
+                            <h2 id="dash-tot-rev" class="gold-text">₹0</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-ticket"></i></div>
+                        <div class="stat-details">
+                            <h3>Tickets Sold</h3>
+                            <h2 id="dash-tot-tickets">0</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-route"></i></div>
+                        <div class="stat-details">
+                            <h3>Active Routes</h3>
+                            <h2 id="dash-tot-routes">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fa-solid fa-map-location-dot icon-lrg"></i> Available Routes</h2>
+                </div>
+            <div id="routes-container" class="routes-grid">
+                <!-- Routes dynamically injected here -->
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="content-section">
+            <h2 class="section-title">Find Your Ticket</h2>
+            <div class="glass-panel search-panel">
+                <input type="text" id="search-id" placeholder="Enter Ticket ID (e.g. T100)">
+                <button class="btn btn-primary" onclick="window.app.searchTicket()">Search</button>
+                <div id="search-result" class="search-result-card hidden"></div>
+            </div>
+        </section>
+
+        <!-- Cancel Section -->
+        <section id="cancel" class="content-section">
+            <h2 class="section-title">Manage Booking</h2>
+            <div class="glass-panel cancel-panel">
+                <p>Enter your Ticket ID to process a cancellation.</p>
+                <input type="text" id="cancel-id" placeholder="Enter Ticket ID (e.g. T100)">
+                <button class="btn btn-danger" onclick="window.app.cancelTicket()">Cancel Booking</button>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="content-section">
+            <h2 class="section-title">System Insights</h2>
+            <div class="reports-grid">
+                <div class="glass-panel chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="glass-panel stats-container" id="top-route-container">
+                    <h3>Most Popular Route</h3>
+                    <h1 id="top-route-display" class="gold-text">--</h1>
+                </div>
+            </div>
+            </div>
+        </section>
+
+    </main>
+    </div> <!-- End layout-wrapper -->
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2 id="modal-route-title">Book Route</h2>
+                <button class="close-btn" onclick="window.app.closeModal()">&times;</button>
+            </div>
+            <div class="modal-body layout-split">
+                <div class="seat-map-section">
+                    <h3>Select Seats</h3>
+                    <div class="legend">
+                        <span class="legend-item"><div class="seat-box available"></div> Available</span>
+                        <span class="legend-item"><div class="seat-box selected"></div> Selected</span>
+                        <span class="legend-item"><div class="seat-box booked"></div> Booked</span>
+                    </div>
+                    <div id="seat-grid" class="seat-grid">
+                        <!-- Seats injected here -->
+                    </div>
+                </div>
+                <div class="booking-details-section">
+                    <h3>Passenger Details</h3>
+                    <input type="text" id="passenger-name" placeholder="Enter full name">
+                    <div class="summary-box">
+                        <p>Selected Seats: <span id="summary-seats">0</span></p>
+                        <p>Total Fare: <span class="gold-text">₹<span id="summary-total">0</span></span></p>
+                    </div>
+                    <button class="btn btn-primary full-width" onclick="window.app.confirmBooking()">Confirm Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WASM Bridge Script -->
+    <script src="app.js"></script>
+    <script src="bus_system.js"></script>
+</body>
+</html>
